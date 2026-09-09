@@ -1,0 +1,24 @@
+{
+  "name": "ha-security-center-card",
+  "version": "0.1.1",
+  "description": "Home Assistant Lovelace card: a full security overview — alarm state, arm/disarm shortcuts, locks, contact sensors and open windows/doors.",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MRDonnii/ha-security-center-card.git"
+  },
+  "keywords": [
+    "home-assistant",
+    "home-assistant-card",
+    "custom-card",
+    "lovelace",
+    "lovelace-card",
+    "dashboard",
+    "security",
+    "alarm",
+    "lock",
+    "sensor"
+  ],
+  "author": "John Thorn Halle",
+  "license": "MIT"
+}

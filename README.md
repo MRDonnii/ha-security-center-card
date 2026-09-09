@@ -100,3 +100,5 @@ dialog.
 ## License
 
 MIT — see [LICENSE](LICENSE).
+The visual card editor provides entity pickers for alarms and scripts plus
+add/remove controls for locks, contacts, windows and doors.

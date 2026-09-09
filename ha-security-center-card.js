@@ -1,4 +1,5 @@
-const SECURITY_CENTER_VERSION = "0.1.1";
+import "./ha-card-list-editor.js";
+const SECURITY_CENTER_VERSION = "0.2.0";
 
 class HaSecurityCenterCard extends HTMLElement {
   static getStubConfig() {
@@ -12,6 +13,7 @@ class HaSecurityCenterCard extends HTMLElement {
       openings_path: "/lovelace/security"
     };
   }
+  static getConfigElement(){const e=document.createElement("ha-card-list-editor");e.definition={roots:[{key:"primary_alarm",label:"Primær alarm",type:"entity"},{key:"primary_alarm_name",label:"Navn på primær alarm"},{key:"secondary_alarm",label:"Sekundær alarm",type:"entity"},{key:"secondary_alarm_name",label:"Navn på sekundær alarm"},{key:"open_count",label:"Antal åbne",type:"entity"},{key:"openings_path",label:"Sti til åbninger"},{key:"actions.disarm",label:"Script: frakobl",type:"entity"},{key:"actions.home",label:"Script: hjemme",type:"entity"},{key:"actions.away",label:"Script: ude",type:"entity"}],collections:[{key:"locks",label:"Låse",itemLabel:"lås",defaults:{name:"Ny lås",icon:"mdi:lock"},fields:[{key:"name",label:"Navn"},{key:"icon",label:"Ikon"},{key:"entity",label:"Lås",type:"entity"}]},{key:"contacts",label:"Adgangspunkter",itemLabel:"kontakt",defaults:{name:"Ny kontakt",icon:"mdi:door-closed"},fields:[{key:"name",label:"Navn"},{key:"icon",label:"Ikon"},{key:"entity",label:"Kontakt",type:"entity"}]},{key:"openings",label:"Vinduer og døre",itemLabel:"åbning",defaults:{name:"Ny åbning"},fields:[{key:"name",label:"Navn"},{key:"entity",label:"Sensor",type:"entity"}]}]};return e;}
   setConfig(config) {
     if (!config) throw new Error("Security Center-kortet kræver en konfiguration");
     this.config = { primary_alarm_name: "Alarm", secondary_alarm_name: "Alarm 2", actions: {}, locks: [], contacts: [], openings: [], ...config };

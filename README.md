@@ -2,6 +2,9 @@
 
 ![Preview](docs/preview.png)
 
+> HACS installs both JavaScript files automatically. For a manual installation,
+> copy `ha-security-center-card.js` and `ha-card-list-editor.js` into the same folder.
+
 A Home Assistant Lovelace card that pulls the whole security picture into
 one view: alarm state with a "radar" hero and one-tap arm/disarm shortcuts,
 a systems row (useful if you run more than one alarm provider), a lock and

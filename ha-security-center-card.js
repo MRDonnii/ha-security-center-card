@@ -1,5 +1,5 @@
 import "./ha-card-list-editor.js";
-const SECURITY_CENTER_VERSION = "0.3.1";
+const SECURITY_CENTER_VERSION = "0.3.2";
 
 class HaSecurityCenterCard extends HTMLElement {
   static getStubConfig() {
@@ -13,7 +13,7 @@ class HaSecurityCenterCard extends HTMLElement {
       openings_path: "/lovelace/security"
     };
   }
-  static getConfigElement(){const e=document.createElement("ha-card-list-editor");e.definition={roots:[{key:"primary_alarm",label:"Primær alarm",type:"entity"},{key:"primary_alarm_name",label:"Navn på primær alarm"},{key:"secondary_alarm",label:"Sekundær alarm",type:"entity"},{key:"secondary_alarm_name",label:"Navn på sekundær alarm"},{key:"open_count",label:"Antal åbne",type:"entity"},{key:"openings_path",label:"Sti til åbninger"},{key:"actions.disarm",label:"Script: frakobl",type:"entity"},{key:"actions.home",label:"Script: hjemme",type:"entity"},{key:"actions.away",label:"Script: ude",type:"entity"}],collections:[{key:"locks",label:"Låse",itemLabel:"lås",defaults:{name:"Ny lås",icon:"mdi:lock"},fields:[{key:"name",label:"Navn"},{key:"icon",label:"Ikon"},{key:"entity",label:"Lås",type:"entity"},{key:"battery_entity",label:"Batteri",type:"entity"},{key:"radio_fault_entity",label:"Radiofejl",type:"entity"},{key:"network_fault_entity",label:"Netværksfejl",type:"entity"},{key:"hardware_fault_entity",label:"Hardwarefejl",type:"entity"}]},{key:"contacts",label:"Adgangspunkter",itemLabel:"kontakt",defaults:{name:"Ny kontakt",icon:"mdi:door-closed"},fields:[{key:"name",label:"Navn"},{key:"icon",label:"Ikon"},{key:"entity",label:"Kontakt",type:"entity"},{key:"battery_entity",label:"Batteri",type:"entity"},{key:"signal_entity",label:"Signal",type:"entity"}]},{key:"openings",label:"Vinduer og døre",itemLabel:"åbning",defaults:{name:"Ny åbning"},fields:[{key:"name",label:"Navn"},{key:"entity",label:"Sensor",type:"entity"}]}]};return e;}
+  static getConfigElement(){const e=document.createElement("ha-card-list-editor");e.definition={roots:[{key:"primary_alarm",label:"Primær alarm",type:"entity"},{key:"primary_alarm_name",label:"Navn på primær alarm"},{key:"secondary_alarm",label:"Sekundær alarm",type:"entity"},{key:"secondary_alarm_name",label:"Navn på sekundær alarm"},{key:"open_count",label:"Antal åbne",type:"entity"},{key:"openings_path",label:"Sti til åbninger"},{key:"actions.disarm",label:"Script: frakobl",type:"entity"},{key:"actions.home",label:"Script: hjemme",type:"entity"},{key:"actions.away",label:"Script: ude",type:"entity"}],collections:[{key:"locks",label:"Låse",itemLabel:"lås",defaults:{name:"Ny lås",icon:"mdi:lock"},fields:[{key:"name",label:"Navn"},{key:"icon",label:"Ikon"},{key:"entity",label:"Lås",type:"entity"},{key:"battery_entity",label:"Batteri",type:"entity"},{key:"radio_fault_entity",label:"Radiofejl",type:"entity"},{key:"network_fault_entity",label:"Netværksfejl",type:"entity"},{key:"hardware_fault_entity",label:"Hardwarefejl",type:"entity"}]},{key:"contacts",label:"Adgangspunkter",itemLabel:"kontakt",defaults:{name:"Ny kontakt",icon:"mdi:door-closed",inverted:false},fields:[{key:"name",label:"Navn"},{key:"icon",label:"Ikon"},{key:"entity",label:"Kontakt",type:"entity"},{key:"inverted",label:"Omvendt kontakt (åben = sikret)",type:"boolean"},{key:"battery_entity",label:"Batteri",type:"entity"},{key:"signal_entity",label:"Signal",type:"entity"}]},{key:"openings",label:"Vinduer og døre",itemLabel:"åbning",defaults:{name:"Ny åbning"},fields:[{key:"name",label:"Navn"},{key:"entity",label:"Sensor",type:"entity"}]}]};return e;}
   setConfig(config) {
     if (!config) throw new Error("Security Center-kortet kræver en konfiguration");
     this.config = { primary_alarm_name: "Alarm", secondary_alarm_name: "Alarm 2", actions: {}, locks: [], contacts: [], openings: [], ...config };
@@ -69,15 +69,16 @@ class HaSecurityCenterCard extends HTMLElement {
     });
     const contacts = (this.config.contacts || []).map(x => {
       const state = this._s(x.entity)?.state;
-      const cls = (state === undefined || ["unavailable", "unknown"].includes(state)) ? "error" : state === "off" ? "locked" : "unlocked";
+      const secured = x.inverted ? state === "on" : state === "off";
+      const cls = (state === undefined || ["unavailable", "unknown"].includes(state)) ? "error" : secured ? "locked" : "unlocked";
       return { ...x, state, cls, battery: battery(x.battery_entity), signal: linkq(x.signal_entity) };
     });
     const clsColor = c => c === "locked" ? "var(--dashboard-success, var(--success-color, #5edbb0))" : c === "unlocked" ? "var(--dashboard-warning, var(--warning-color, #ffbd59))" : "var(--dashboard-danger, var(--error-color, #ff626f))";
     const batteryIcon = b => b <= 20 ? "mdi:battery-alert-variant-outline" : b <= 50 ? "mdi:battery-50" : "mdi:battery";
     const openings = (this.config.openings || []).map(x => ({ ...x, state: this._s(x.entity)?.state })).filter(x => x.state === "on");
     const unavailable = (this.config.openings || []).filter(x => ["unavailable", "unknown", undefined].includes(this._s(x.entity)?.state));
-    const locked = locks.filter(x => x.state === "locked").length;
-    const insecureContacts = contacts.filter(x => x.state === "on").length;
+    const locked = locks.filter(x => x.cls === "locked").length;
+    const insecureContacts = contacts.filter(x => x.cls === "unlocked").length;
     const mode = info[3];
     this.shadowRoot.innerHTML = `<style>
       :host{display:block;color:#f5f8fc;font-family:var(--paper-font-body1_-_font-family,Inter,system-ui,sans-serif)}*{box-sizing:border-box}
@@ -108,7 +109,7 @@ class HaSecurityCenterCard extends HTMLElement {
         }).join("")}
         ${contacts.map(x=>{
           const color = clsColor(x.cls);
-          const label = x.cls==='error' ? 'Fejl' : x.state==='off' ? 'Sikret' : 'Ikke sikret';
+          const label = x.cls==='error' ? 'Fejl' : x.cls==='locked' ? 'Sikret' : 'Ikke sikret';
           const meta = [];
           if (Number.isFinite(x.battery)) meta.push(`<span><ha-icon icon="${batteryIcon(x.battery)}"></ha-icon>${x.battery}%</span>`);
           if (Number.isFinite(x.signal)) meta.push(`<span><ha-icon icon="${x.signal<=30?'mdi:wifi-strength-1-alert':'mdi:wifi'}"></ha-icon>${x.signal}%</span>`);

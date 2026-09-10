@@ -65,6 +65,7 @@ locks:
 contacts:
   - entity: binary_sensor.garage_door_contact
     name: Garage door
+    inverted: true
 openings:
   - entity: binary_sensor.living_room_window
     name: Living room window
@@ -92,7 +93,7 @@ alongside a local `alarm_control_panel`) with `secondary_alarm` /
 | `secondary_alarm_name` | Label for the secondary alarm (default `Alarm 2`) |
 | `actions.disarm` / `actions.home` / `actions.away` | `script` entity called when the matching mode button is pressed — a mode button without a matching action renders disabled |
 | `locks` | List of `{entity, name, icon}` — shown in the access grid with a tap-to-toggle lock/unlock button |
-| `contacts` | List of `{entity, name, icon}` — `binary_sensor` shown as secured/not-secured, no toggle |
+| `contacts` | List of `{entity, name, icon, inverted}` — `binary_sensor` shown as secured/not-secured; use `inverted: true` when `on`/open means secured |
 | `openings` | List of `{entity, name}` — `binary_sensor` entities checked for open windows/doors; only the currently-open ones are listed |
 | `openings_path` | Dashboard path to navigate to when the open-panel is tapped — the panel isn't clickable if omitted |
 
@@ -105,3 +106,5 @@ dialog.
 MIT — see [LICENSE](LICENSE).
 The visual card editor provides entity pickers for alarms and scripts plus
 add/remove controls for locks, contacts, windows and doors.
+Each contact also has an **Omvendt kontakt** checkbox, so reversed physical
+contacts can be configured without changing the sensor or the card source.

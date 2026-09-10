@@ -26,7 +26,7 @@ class HACardListEditor extends HTMLElement {
   _control(field, value, scope, index = -1) {
     const common = `data-scope="${scope}" data-index="${index}" data-key="${field.key}"`;
     if (field.type === "entity") return `<label><span>${field.label}</span><ha-entity-picker ${common} value="${this._escape(value || "")}" allow-custom-entity></ha-entity-picker></label>`;
-    if (field.type === "boolean") return `<label class="check"><input ${common} type="checkbox" ${value !== false ? "checked" : ""}><span>${field.label}</span></label>`;
+    if (field.type === "boolean") return `<label class="check"><input ${common} type="checkbox" ${value === true ? "checked" : ""}><span>${field.label}</span></label>`;
     if (field.type === "number") return `<label><span>${field.label}</span><input ${common} type="number" value="${this._escape(value ?? "")}" min="${field.min ?? ""}" max="${field.max ?? ""}"></label>`;
     return `<label><span>${field.label}</span><input ${common} type="text" value="${this._escape(value || "")}" placeholder="${this._escape(field.placeholder || "")}"></label>`;
   }

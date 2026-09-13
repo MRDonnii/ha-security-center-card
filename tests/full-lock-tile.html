@@ -1,0 +1,35 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>pending</title>
+<script type="module">
+  import "../ha-security-center-card.js";
+  const calls = [];
+  const card = document.createElement("ha-security-center-card");
+  card.setConfig({
+    primary_alarm:"alarm_control_panel.one", primary_alarm_name:"Verisure",
+    secondary_alarm:"alarm_control_panel.two", secondary_alarm_name:"Ajax",
+    locks:[{ entity:"lock.front", name:"Hoveddør" }]
+  });
+  const hass = state => ({
+    callService:(domain,service,data) => calls.push({domain,service,data}),
+    states:{
+      "alarm_control_panel.one":{state:"disarmed",last_changed:"2026-09-13T18:00:00Z"},
+      "alarm_control_panel.two":{state:"armed_away",last_changed:"2026-09-13T18:00:00Z"},
+      "lock.front":{state,last_changed:"2026-09-13T18:00:00Z"}
+    }
+  });
+  document.body.append(card);
+  card.hass = hass("locked");
+  const shell = card.shadowRoot.querySelector(".shell");
+  const tile = card.shadowRoot.querySelector('[data-lock="lock.front"]');
+  tile.click();
+  card.hass = hass("unlocked");
+  const sameShell = shell === card.shadowRoot.querySelector(".shell");
+  const sameTile = tile === card.shadowRoot.querySelector('[data-lock="lock.front"]');
+  tile.dispatchEvent(new KeyboardEvent("keydown", { key:"Enter", bubbles:true }));
+  const labels = [...card.shadowRoot.querySelectorAll(".system b")].map(node => node.textContent);
+  const passed = sameShell && sameTile && labels.join("|") === "Verisure|Ajax"
+    && calls[0]?.service === "unlock" && calls[1]?.service === "lock"
+    && tile.dataset.state === "unlocked" && tile.getAttribute("role") === "button";
+  document.title = passed ? "pass" : `fail:${sameShell}:${sameTile}:${labels}:${JSON.stringify(calls)}`;
+</script>

@@ -97,8 +97,8 @@ alongside a local `alarm_control_panel`) with `secondary_alarm` /
 | `openings` | List of `{entity, name}` — `binary_sensor` entities checked for open windows/doors; only the currently-open ones are listed |
 | `openings_path` | Dashboard path to navigate to when the open-panel is tapped — the panel isn't clickable if omitted |
 
-Tapping a lock's action button toggles it directly; tapping anywhere else
-on a lock/contact tile, or a system row, opens that entity's more-info
+Tapping anywhere on a lock tile toggles it directly. Lock tiles also support
+Enter/Space from a keyboard. Tapping a contact tile or a system row opens its more-info
 dialog.
 
 ## License
